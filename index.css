@@ -1,0 +1,76 @@
+*, *::after, *::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.game-container {
+    height: 50%;
+    width: 50%;
+    overflow: scroll;
+}
+
+.game-screen {
+    height: 100%;
+    width: 2000px;
+}
+
+.game-field {
+    display: flex;
+    height: 100%;
+}
+
+.obstacles-container {
+    display: flex;
+    height: 100%;
+    /*margin-left: 750px;*/
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.obstacle-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.obstacle {
+    height: 150px;
+    width: 50px;
+    background: red;
+}
+
+.short {
+    height: 100px;
+}
+
+.long {
+    height: 250px;
+}
+
+.player-container {
+    height: 100%;
+    width: 50px;
+    /* position: relative; */
+    display: flex;
+    align-items: center;
+}
+
+.player {
+    height: 30px;
+    width: 30px;
+    background: green;
+    position: absolute;
+}
