@@ -1,17 +1,80 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const gameContainer = document.querySelector('.game-container')
+    const obstaclesContainer = document.querySelector('.obstacles-container')
+    const playerContainer = document.querySelector('.player-container')
+    const game = document.querySelector('.game')
+    const gameScreen = document.querySelector('.game-screen')
     const gameField = document.querySelector('.game-field')
     const player = document.querySelector('.player')
-    let gameStart = false
+    const scoreboard = document.querySelector('.scoreboard')
+    const score = document.querySelector('.score')
+    const jump = 50
+    let gameOver = false
     const points = 30 * 4
-    let fallingId;
+    let timerId;
+    let animationId;
     let checkForObstaclesId
+
+    const obstacleSets = [
+        {
+            top: 'short',
+            bottom: 'long'
+        },
+        {
+            top: '',
+            bottom: ''
+        },
+        {
+            top: 'long',
+            bottom: 'short'
+        }
+    ]
+
+    function mapObstacles() {
+        const obstacleElements = Object.values(obstaclesContainer.children)
+        const { right, width } = playerContainer.getBoundingClientRect()
+        const baseWidth = right - width
+        return obstacleElements.map(element => {
+            return {
+                element,
+                xCord: element.getBoundingClientRect().right - baseWidth
+            }
+        })
+    }
 
     const distanceFromTop = 937 * 25
 
-    console.log(gameContainer)
+    function generateObstacles() {
+        const obstacles = mapObstacles()
+        const middleObstacle = Math.round(obstacles.length / 2)
+
+        if(game.scrollLeft > obstacles[middleObstacle - 1].xCord) {
+            console.log('hello')
+            // obstacles.slice(0, 5).map(obstacle => obstaclesContainer.removeChild(obstacle.element))
+
+            let fragment = document.createDocumentFragment()
+            for(let i = 0; i < 5; i++) {
+                const randomNumber = Math.floor(Math.random() * 3)
+                const randomObstacleSet = obstacleSets[randomNumber]
+                const obstacleContainer = document.createElement('div')
+                obstacleContainer.classList.add('obstacle-container')
+                obstacleContainer.innerHTML = 
+                `
+                    <div class="obstacle ${randomObstacleSet.top}"></div>
+                    <div class="obstacle ${randomObstacleSet.bottom}"></div>
+                `
+                fragment.appendChild(obstacleContainer)
+            }
+            obstaclesContainer.appendChild(fragment)
+
+            // game.scrollLeft -= obstacles[2].xCord
+            const { width } = getComputedStyle(gameScreen)
+            gameScreen.style.width = parseInt(width) + 1000 + 'px'
+        }
+    }
+
 
     gameField.addEventListener('click', (e) => {
+        const halfwayPoint = ((game.scrollWidth - game.clientWidth) / 2) + game.clientWidth / 2
         const playerCords = player.getBoundingClientRect()
         const startingPosition = playerCords.top + (playerCords.height / 2)
 
@@ -19,9 +82,26 @@ document.addEventListener('DOMContentLoaded', () => {
         // const { top, bottom, right, left, height, width } = playerCords
 
         // console.log(obstacleHit, 'Obstacle Hit')
+        // console.log(floorXCord, playerCords.bottom, 'x cords')
+        console.log(halfwayPoint, game.scrollLeft)
 
-        if(gameStart) {
-                if(player.style.transform) {
+        // if(game.scrollLeft >= halfwayPoint) {
+        //     // const { width } = getComputedStyle(gameScreen)
+        //     // gameScreen.style.width = parseInt(width) + 1000 + 'px'
+        //     generateObstacles()
+        //     Object.values(obstaclesContainer.children).slice(0,5).map(oc => obstaclesContainer.removeChild(oc))
+        //     game.scrollLeft -= 975
+        // }
+
+                if(!player.style.transform) {
+                    console.log('??')
+                    player.style.transform = "translateY(-50px)"
+                }
+                    console.log(timerId)
+                    if(timerId) {
+                        clearTimeout(timerId) 
+                        cancelAnimationFrame(animationId)
+                    }
                     console.log(player.style.transform)
                     const transformPos = player.style.transform.match(/-*\d+/g).join('')
                     const value = parseInt(transformPos)
@@ -34,64 +114,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     // player.style.top = (parseFloat(player.style.top) - 50) + 'px'
                     player.style.transform = 'translateY('  + newValue +'px'
                     checkIfGameOver(player.getBoundingClientRect())
+                    const timeToMaxHeight = Math.sqrt((2 * jump) / 9.81) 
+                    console.log(timeToMaxHeight)
+                    timerId = setTimeout(() => {
+                        let currentTime = 0
+                        let startTime = 0
+                        let delay = 1000 / 60
+                        function gameMode(timeStamp) {
+                            cancelAnimationFrame(animationId)
+                            generateObstacles()
+                            console.log('hello')
+                            if(startTime === 0) startTime = timeStamp
+                            const elapsed = timeStamp - startTime
+                            currentTime = timeStamp
+                            game.scrollLeft += 5
+                            if(player.style.transform) {
+                                const transformPos = player.style.transform.match(/-*\d+/g).join('')
+                                const value = parseInt(transformPos)
+                                const drop = Math.round(value + (0.5 * 9.81 * (elapsed/1000)))
+                                player.style.top = (parseFloat(player.style.top) + 1.5) + 'px'
+                                player.style.transform = `translateY(${(drop)}px)`
+                                const gameStatus = checkIfGameOver(player.getBoundingClientRect())
+                                return gameStatus === 0 ? alert('Game over bro') : animationId = window.requestAnimationFrame(gameMode)
+                            }
+                            player.style.transform = "translateY(1px)"
+                            animationId = window.requestAnimationFrame(gameMode)
+                        }
+                        animationId = window.requestAnimationFrame(gameMode)
+                    }, 10)
                     return;
-                }
-                console.log('??')
-                return player.style.transform = "translateY(-50px)"
-
-        } else {
-            gameStart = true
-            let currentTime = 0
-            let delay = 1000 / 60
-            function gameMode(timeStamp) {
-                // console.log(playerCords)
-                // gameContainer.animate({
-                //     scrollLeft: [gameContainer.scrollLeft, gameContainer.scrollLeft + 50]
-                // }, 10)
-                if(timeStamp < currentTime) { window.requestAnimationFrame(gameMode); return; }
-                currentTime = timeStamp + delay
-                gameContainer.scrollLeft += 3
-                if(player.style.transform) {
-                    const transformPos = player.style.transform.match(/-*\d+/g).join('')
-                    const value = parseInt(transformPos)
-                    console.log('Value going down')
-                    // player.animate({
-                    //     transform: [player.style.transform, `translateY(${(value + 1)}px)`]
-                    // }, 100)
-                    // player.style.top = (parseFloat(player.style.top) + 1.5) + 'px'
-                    player.style.transform = `translateY(${(value + 3)}px)`
-                    const gameStatus = checkIfGameOver(player.getBoundingClientRect())
-                    window.requestAnimationFrame(gameMode)
-                    return;
-                }
-                player.style.transform = "translateY(1px)"
-                window.requestAnimationFrame(gameMode)
-            }
-            window.requestAnimationFrame(gameMode)
-            // timerId = setTimeout(function gameMode() {
-            //     // console.log(playerCords)
-            //     // gameContainer.animate({
-            //     //     scrollLeft: [gameContainer.scrollLeft, gameContainer.scrollLeft + 50]
-            //     // }, 10)
-            //     gameContainer.scrollLeft += 10
-            //     if(player.style.top) {
-            //         player.animate({
-            //             top: [player.style.top, (parseFloat(player.style.top) + 9.81) + 'px']
-            //         }, 100)
-            //         player.style.top = (parseFloat(player.style.top) + 9.81) + 'px'
-            //         const gameStatus = checkIfGameOver(player.getBoundingClientRect())
-            //         console.log(gameStatus, 'GS')
-            //         timerId = setTimeout(gameMode, 100)
-            //         return;
-            //     }
-            //     player.style.top = startingPosition + 'px'
-            //     timerId = setTimeout(gameMode, 100)
-            // }, 100)
-        }
     })
 
     function checkIfGameOver(cordsToCheck) {
         const { top, bottom, right, left, height, width } = cordsToCheck
+        const floorXCord = gameField.getBoundingClientRect().bottom
 
         const cords = [
             {x: left, y: top, position: 'TL'},
@@ -99,43 +155,48 @@ document.addEventListener('DOMContentLoaded', () => {
             {x: left + width, y: top + height, position: 'BR'},
             {x: left, y: height + top, position: 'BL'}]
 
+        const currentObstacles = mapObstacles() 
+
+        const numOfObstaclesCleared = currentObstacles.filter(obstacle => game.scrollLeft >= obstacle.xCord)
+        score.textContent = numOfObstaclesCleared.length
+            
+        if(gameOver || bottom >= floorXCord) {
+            return 0;
+        }
+
         return cords.some(cords => {
             switch (cords.position) {
                 case 'TL': {
                     const allElements = document.elementsFromPoint(cords.x , cords.y)
                     const allElementsInArray = Object.values(allElements)
                     const touchedObstacle = allElementsInArray.filter(element => element.classList.contains('obstacle'))
-                    touchedObstacle.length > 0 ? alert('Game over') : null
+                    if(touchedObstacle.length > 0) alert('Game over')
                     return touchedObstacle.length
                 }
                 case 'TR': {
                     const allElements = document.elementsFromPoint(cords.x , cords.y)
                     const allElementsInArray = Object.values(allElements)
                     const touchedObstacle = allElementsInArray.filter(element => element.classList.contains('obstacle'))
-                    touchedObstacle.length > 0 ? alert('Game over') : null
-                     return touchedObstacle.length
+                    if(touchedObstacle.length > 0) alert('Game over')
+                    return touchedObstacle.length
                 }
                 case 'BR': {
                     const allElements = document.elementsFromPoint(cords.x , cords.y)
                     const allElementsInArray = Object.values(allElements)
                     const touchedObstacle = allElementsInArray.filter(element => element.classList.contains('obstacle'))
-                    touchedObstacle.length > 0 ? alert('Game over') : null
+                    if(touchedObstacle.length > 0) alert('Game over')
                     return touchedObstacle.length
                 }
                 case 'BL': {
                     const allElements = document.elementsFromPoint(cords.x , cords.y)
                     const allElementsInArray = Object.values(allElements)
                     const touchedObstacle = allElementsInArray.filter(element => element.classList.contains('obstacle'))
-                    touchedObstacle.length > 0 ? alert('Game over') : null
+                    if(touchedObstacle.length > 0) alert('Game over')
                     return touchedObstacle.length
                 }
             }
         })
     }
-    // setInterval(() => {
-    //     gameContainer.scrollLeft += 10
-    // }, 500)
-
 })
 
 // TODO

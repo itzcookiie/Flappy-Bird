@@ -14,13 +14,18 @@ html {
     align-items: center;
     height: 100vh;
     width: 100vw;
+    flex-direction: column;
 }
 
-.game-container {
-    height: 50%;
-    width: 50%;
+.game {
+    height: 500px;
+    width: 500px;
     overflow: scroll;
 }
+
+.game::-webkit-scrollbar {
+    display: none;
+  }
 
 .game-screen {
     height: 100%;
@@ -47,7 +52,7 @@ html {
 }
 
 .obstacle {
-    height: 150px;
+    height: 175px;
     width: 50px;
     background: red;
 }
@@ -73,4 +78,9 @@ html {
     width: 30px;
     background: green;
     position: absolute;
+}
+
+.scoreboard {
+    position: relative;
+    top: 100px;
 }
