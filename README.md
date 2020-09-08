@@ -1,5 +1,7 @@
 # Flappy-Bird
 
+##### 09/09/20 - Game is officially done or at least functionality wise. Changes now are to improve the game
+
 ### Learnings
 
 - Learned about window.requestAnimationFrame and using it over setInterval. Still need to understand this more. Understand at the very least, it acts like setTimeout. The browser waits for the next repaint before loading it up, but need more understanding of this
