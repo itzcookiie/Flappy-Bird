@@ -7,12 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const player = document.querySelector('.player')
     const scoreboard = document.querySelector('.scoreboard')
     const score = document.querySelector('.score')
+    const gameMenu = document.querySelector('.gameover-menu')
+    const playAgainButton = document.querySelector('.play-again-button')
+    const latestScore = document.querySelector('.latest-score'),
+            highScoreEl = document.querySelector('.high-score')
     const jump = 50
     let gameOver = false
-    const points = 30 * 4
     let timerId;
     let animationId;
-    let checkForObstaclesId
 
     const obstacleSets = [
         {
@@ -72,6 +74,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    playAgainButton.addEventListener('click', (e) => {
+        gameOver = false;
+        gameMenu.style.display = 'none'
+
+        player.style.transform = ''
+
+        game.scrollLeft = 0
+
+    })
+
 
     gameField.addEventListener('click', (e) => {
         const halfwayPoint = ((game.scrollWidth - game.clientWidth) / 2) + game.clientWidth / 2
@@ -121,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         let startTime = 0
                         let delay = 1000 / 60
                         function gameMode(timeStamp) {
-                            cancelAnimationFrame(animationId)
                             generateObstacles()
                             console.log('hello')
                             if(startTime === 0) startTime = timeStamp
@@ -135,7 +146,23 @@ document.addEventListener('DOMContentLoaded', () => {
                                 player.style.top = (parseFloat(player.style.top) + 1.5) + 'px'
                                 player.style.transform = `translateY(${(drop)}px)`
                                 const gameStatus = checkIfGameOver(player.getBoundingClientRect())
-                                return gameStatus === 0 ? alert('Game over bro') : animationId = window.requestAnimationFrame(gameMode)
+                                console.log(gameStatus)
+                                if(gameStatus) {
+                                    gameOver = true;
+                                    latestScore.textContent = score.textContent
+                                    const currentHighScore = localStorage.getItem('highScore')
+                                    if(currentHighScore) {
+                                        +score.textContent > +currentHighScore ? localStorage.setItem('highScore', score.textContent) : null
+                                    } else {
+                                        localStorage.setItem('highScore', score.textContent)
+                                    }
+                                    highScoreEl.textContent = localStorage.getItem('highScore')
+                                    gameMenu.style.display = 'block'
+                                    return;
+                                } else {
+                                    animationId = window.requestAnimationFrame(gameMode)
+                                    return;
+                                }
                             }
                             player.style.transform = "translateY(1px)"
                             animationId = window.requestAnimationFrame(gameMode)
@@ -161,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         score.textContent = numOfObstaclesCleared.length
             
         if(gameOver || bottom >= floorXCord) {
-            return 0;
+            return true;
         }
 
         return cords.some(cords => {
@@ -170,28 +197,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     const allElements = document.elementsFromPoint(cords.x , cords.y)
                     const allElementsInArray = Object.values(allElements)
                     const touchedObstacle = allElementsInArray.filter(element => element.classList.contains('obstacle'))
-                    if(touchedObstacle.length > 0) alert('Game over')
                     return touchedObstacle.length
                 }
                 case 'TR': {
                     const allElements = document.elementsFromPoint(cords.x , cords.y)
                     const allElementsInArray = Object.values(allElements)
                     const touchedObstacle = allElementsInArray.filter(element => element.classList.contains('obstacle'))
-                    if(touchedObstacle.length > 0) alert('Game over')
                     return touchedObstacle.length
                 }
                 case 'BR': {
                     const allElements = document.elementsFromPoint(cords.x , cords.y)
                     const allElementsInArray = Object.values(allElements)
                     const touchedObstacle = allElementsInArray.filter(element => element.classList.contains('obstacle'))
-                    if(touchedObstacle.length > 0) alert('Game over')
                     return touchedObstacle.length
                 }
                 case 'BL': {
                     const allElements = document.elementsFromPoint(cords.x , cords.y)
                     const allElementsInArray = Object.values(allElements)
                     const touchedObstacle = allElementsInArray.filter(element => element.classList.contains('obstacle'))
-                    if(touchedObstacle.length > 0) alert('Game over')
                     return touchedObstacle.length
                 }
             }

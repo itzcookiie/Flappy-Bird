@@ -14,7 +14,6 @@ html {
     align-items: center;
     height: 100vh;
     width: 100vw;
-    flex-direction: column;
 }
 
 .game {
@@ -30,6 +29,7 @@ html {
 .game-screen {
     height: 100%;
     width: 2000px;
+    background: lightgreen;
 }
 
 .game-field {
@@ -68,7 +68,6 @@ html {
 .player-container {
     height: 100%;
     width: 50px;
-    /* position: relative; */
     display: flex;
     align-items: center;
 }
@@ -76,11 +75,43 @@ html {
 .player {
     height: 30px;
     width: 30px;
-    background: green;
-    position: absolute;
+    background: yellow;
+    position: fixed;
 }
 
 .scoreboard {
     position: relative;
     top: 100px;
+    display: flex;
+    justify-content: center;
+}
+
+.gameover-menu {
+    display: none;
+    position: absolute;
+    background-color: lightblue;
+    height: 150px;
+    width: 150px;
+    text-align: center;
+    color: white;
+}
+
+.results {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.play-again-button {
+    height: 100px;
+    width: 100px;
+    background: green;
+    color: white;
+    font-weight: 800;
+    border-radius: 50px;
+    box-shadow: aqua 1px solid;
+    font-size: 1.2rem;
 }
