@@ -30,7 +30,7 @@ html {
     height: 100%;
     width: 2000px;
     background: lightgreen;
-    border-bottom: 10px solid black;
+    border-bottom: 10px solid orange;
 }
 
 .game-field {
@@ -80,7 +80,7 @@ html {
 .player {
     height: 30px;
     width: 30px;
-    background: yellow;
+    background: darkgreen;
     position: fixed;
 }
 
