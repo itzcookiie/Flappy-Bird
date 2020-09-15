@@ -37,12 +37,16 @@ html {
     height: 100%;
 }
 
+.obstacles-container-frame {
+    width: 100%;
+}
+
 .obstacles-container {
     display: flex;
     height: 100%;
-    /*margin-left: 750px;*/
     justify-content: space-evenly;
     width: 100%;
+    margin-left: 750px;
 }
 
 .obstacle-container {
